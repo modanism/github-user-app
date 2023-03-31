@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
@@ -29,14 +30,19 @@ class DetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
 
         val detailViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(DetailViewModel::class.java)
 
         detailViewModel.detailUser.observe(this, { user ->
             setDetailUserData(user)
+        })
+
+        detailViewModel.isLoading.observe(this, {
+            showLoading(it)
         })
 
         val userData = if (Build.VERSION.SDK_INT >= 33) {
@@ -48,15 +54,20 @@ class DetailActivity : AppCompatActivity() {
 
         Log.d("DetailTest", userData.toString())
 
-        binding.apply {
-            Glide.with(this@DetailActivity)
-                .load(userData?.avatarUrl)
-                .centerCrop()
-                .into(ivDetail)
-            tvDetailName.text = userData?.login
+        val username = userData?.login
+        if (username != null) {
+            detailViewModel.findDetailUser(username)
         }
 
-        val sectionsPagerAdapter = SectionsPagerAdapter(this)
+//        binding.apply {
+//            Glide.with(this@DetailActivity)
+//                .load(userData?.avatarUrl)
+//                .centerCrop()
+//                .into(ivDetail)
+//            tvDetailName.text = userData?.login
+//        }
+
+        val sectionsPagerAdapter = SectionsPagerAdapter(this,username!!)
         val viewPager: ViewPager2 = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
@@ -70,9 +81,13 @@ class DetailActivity : AppCompatActivity() {
         binding.apply {
             tvDetailLogin.text = userData.login
             tvDetailName.text = userData.name
-            Glide.with(this@DetailActivity)
+            Glide.with(this@DetailActivity  )
                 .load(userData.avatarUrl)
                 .into(ivDetail)
         }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.detailProgressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 }

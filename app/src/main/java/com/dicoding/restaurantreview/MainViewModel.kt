@@ -16,6 +16,9 @@ class MainViewModel : ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+    private val _errorMessage = MutableLiveData<Event<String>>()
+    val errorMessage: LiveData<Event<String>> = _errorMessage
+
 
     companion object{
         private const val TAG = "MainViewModel"
@@ -37,12 +40,14 @@ class MainViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     _listReview.value = response.body()?.items?.map { User(it.followingUrl, it.login, it.followersUrl, it.avatarUrl, it.id) }
                 } else {
+                    _errorMessage.value = Event(response.message())
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
 
             override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                 _isLoading.value = false
+                _errorMessage.value = Event("Check your internet connection!")
                 Log.e(TAG, "onFailure: ${t.message.toString()}")
             }
         })

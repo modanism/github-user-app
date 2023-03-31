@@ -1,7 +1,10 @@
 package com.dicoding.restaurantreview
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class UserDetailResponse(
 
 	@field:SerializedName("gists_url")
@@ -12,12 +15,6 @@ data class UserDetailResponse(
 
 	@field:SerializedName("following_url")
 	val followingUrl: String,
-
-	@field:SerializedName("twitter_username")
-	val twitterUsername: Any,
-
-	@field:SerializedName("bio")
-	val bio: Any,
 
 	@field:SerializedName("created_at")
 	val createdAt: String,
@@ -52,14 +49,8 @@ data class UserDetailResponse(
 	@field:SerializedName("gravatar_id")
 	val gravatarId: String,
 
-	@field:SerializedName("email")
-	val email: Any,
-
 	@field:SerializedName("organizations_url")
 	val organizationsUrl: String,
-
-	@field:SerializedName("hireable")
-	val hireable: Any,
 
 	@field:SerializedName("starred_url")
 	val starredUrl: String,
@@ -99,4 +90,4 @@ data class UserDetailResponse(
 
 	@field:SerializedName("node_id")
 	val nodeId: String
-)
+) : Parcelable

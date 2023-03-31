@@ -12,20 +12,14 @@ class DetailViewModel : ViewModel() {
     private val _detailUser = MutableLiveData<UserDetailResponse>()
     val detailUser: LiveData<UserDetailResponse> = _detailUser
 
-    private val _listFollower = MutableLiveData<List<User>>()
-    val listFollower: LiveData<List<User>> = _listFollower
+    private val _listFollow = MutableLiveData<List<UserDetailResponse>>()
+    val listFollow: LiveData<List<UserDetailResponse>> = _listFollow
 
     private val _listFollowing = MutableLiveData<List<User>>()
     val listFollowing: LiveData<List<User>> = _listFollowing
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
-
-    private val _isFollowingLoading = MutableLiveData<Boolean>()
-    val isFollowingLoading: LiveData<Boolean> = _isFollowingLoading
-
-    private val _isFollowerLoading = MutableLiveData<Boolean>()
-    val isFollowerLoading: LiveData<Boolean> = _isFollowerLoading
 
     companion object{
         private const val TAG = "DetailViewModel"
@@ -53,6 +47,35 @@ class DetailViewModel : ViewModel() {
                 Log.e(TAG, "onFailure: ${t.message.toString()}")
             }
         })
+
+    }
+
+    fun findFollow(opt: String, username: String) {
+        Log.d("Username",username)
+        _isLoading.value = true
+        val client = if (opt == "follower") {
+            ApiConfig.getApiService().getFollowers(username)
+        } else {
+           ApiConfig.getApiService().getFollowing(username)
+        }
+        client.enqueue(object : Callback<List<UserDetailResponse>> {
+            override fun onResponse(call: Call<List<UserDetailResponse>>, response: Response<List<UserDetailResponse>>) {
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    Log.d("Testing",response.body().toString())
+                    _listFollow.value = response.body()
+                } else {
+                    Log.e(TAG,"onFailure: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<UserDetailResponse>>, t: Throwable) {
+                _isLoading.value = false
+                Log.e(TAG, "onFailure: ${t.message.toString()}")
+            }
+
+        })
+
 
     }
 
